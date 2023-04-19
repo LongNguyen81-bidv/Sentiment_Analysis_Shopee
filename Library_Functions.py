@@ -7,13 +7,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set_style("white")
 
-import scipy
-from scipy.stats import iqr
-from scipy.stats import chi2_contingency
-from scipy.stats import chi2
-import statsmodels.api as sm
-from statsmodels.formula.api import ols
-from statsmodels.stats.multicomp import pairwise_tukeyhsd
+# import scipy
+# from scipy.stats import iqr
+# from scipy.stats import chi2_contingency
+# from scipy.stats import chi2
+# import statsmodels.api as sm
+# from statsmodels.formula.api import ols
+# from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 from underthesea import word_tokenize, pos_tag, sent_tokenize
 import regex
