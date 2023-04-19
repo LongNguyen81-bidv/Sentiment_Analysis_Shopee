@@ -1,3 +1,4 @@
+openpyxl
 numpy
 pandas
 seaborn
@@ -5,9 +6,11 @@ streamlit
 underthesea
 wordcloud
 import_ipynb
-statsmodels
+playsound
+gtts
+pyaudio
+speechrecognition
 demoji	
 pyvi
 emoji
 imblearn
-openpyxl

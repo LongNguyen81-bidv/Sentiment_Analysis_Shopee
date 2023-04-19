@@ -50,6 +50,22 @@ from wordcloud import WordCloud,STOPWORDS
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, classification_report, roc_auc_score, roc_curve, auc
 
+# Support voice
+import time
+import sys
+import ctypes
+import datetime
+import json
+import re
+import webbrowser
+import smtplib
+import requests
+import urllib
+import urllib.request as urllib2
+from time import strftime
+import pyaudio
+
+import speech_recognition as sr
 
 #---------------------------------------------------------------------------------------------
 ##LOAD EMOJICON
@@ -103,6 +119,11 @@ file.close()
 @st.cache_data
 def df():
     df = pd.read_csv('processed_data.csv')
+    return df
+# load data parquet
+@st.cache_data
+def df_parquet():
+    df = pd.read_parquet('processed_data.parquet')
     return df
 #---------------------------------------------------------------------------------------------
 @st.cache_data

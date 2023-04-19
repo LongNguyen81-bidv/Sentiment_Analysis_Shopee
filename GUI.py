@@ -1,12 +1,14 @@
 
 from Library_Functions import *
 #----------------------------------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------------------------------
 # Part 1: Build project
 #----------------------------------------------------------------------------------------------------
 
 # Load data
 # print('Loading data.....')
-df = df()
+df = df_parquet()
 
 ### Load model
 
@@ -141,53 +143,23 @@ elif choice == 'Xây dựng mô hình':
     st.write('##### Biểu đồ Bar cho biểu thị tình cảm')
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.bar(df['sentiment'].value_counts().index, df['sentiment'].value_counts().values)
+    # add percentage labels to bars (color: black), format: 2 decimal places, center labels
+    for p in ax.patches:
+        ax.annotate('{:.2f}%'.format(p.get_height()/len(df)*100), (p.get_x()+0.4, p.get_height()+1000), color='black', ha='center')
+
     ax.set_xticks(df['sentiment'].value_counts().index)
     ax.set_xticklabels(['Tiêu cực', 'Tích cực'])
     ax.set_ylabel('Số lượng bình luận')
     ax.set_title('Biểu đồ Bar cho biểu thị tình cảm')
     st.pyplot(fig)
-
-    ## Negative
+    
+    # ## Negative
     st.write('##### Wordcloud Cho bình luận tiêu cực')
-    neg_ratings=df[df.sentiment==0]
-    neg_words=[]
-    for t in neg_ratings.comment:
-        neg_words.append(t)
-    neg_text=pd.Series(neg_words).str.cat(sep=' ')
-    ## instantiate a wordcloud object
-    wc =WordCloud(
-        background_color='black',
-        max_words=200,
-        stopwords=stopwords_lst,
-        width=1600,height=800,
-        max_font_size=200)
-    wc.generate(neg_text)
-    ## Display the wordcloud
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.imshow(wc,interpolation='bilinear')
-    ax.axis('off')
-    st.pyplot(fig)    
-
-    ## Positive
+    st.image('sentiment_0.png')
+    
+    # ## Positive
     st.write('##### Wordcloud Cho bình luận tích cực')
-    pos_ratings=df[df.sentiment==1]
-    pos_words=[]
-    for t in pos_ratings.comment:
-        pos_words.append(t)
-    pos_text=pd.Series(pos_words).str.cat(sep=' ')
-    ## instantiate a wordcloud object
-    wc =WordCloud(
-        background_color='black',
-        max_words=200,
-        stopwords=stopwords_lst,
-        width=1600,height=800,
-        max_font_size=200)
-    wc.generate(pos_text)
-    ## Display the wordcloud
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.imshow(wc,interpolation='bilinear')
-    ax.axis('off')
-    st.pyplot(fig)    
+    st.image('sentiment_1.png')
 
     st.write('#### Xây dựng mô hình và đánh giá:')
     st.write('##### Confusion matrix')
@@ -210,7 +182,10 @@ elif choice == 'Dự đoán mới':
     st.write('''
     Nhập vào một bình luận và mô hình sẽ dự đoán tình cảm của bình luận. 
     ''')
-    menu = ["Nhập bình luận", "Tải tệp Excel", "Tải tệp CSV"]
+    # menu = ["Nhập bình luận", "Tải tệp Excel", "Tải tệp CSV", "Bình luận bằng giọng nói", "Nói chuyện với chatGPT"]
+    # menu = ["Nhập bình luận", "Tải tệp Excel", "Tải tệp CSV"]
+    menu = ["Nhập bình luận", "Tải tệp Excel", "Tải tệp CSV", "Tải tệp âm thanh"]
+
     choice = st.selectbox("Menu",menu)
     if choice == "Nhập bình luận":
         comment = st.text_input('Nhập vào một bình luận')
@@ -285,6 +260,11 @@ elif choice == 'Dự đoán mới':
                 st.subheader("Biểu đồ cột thể hiện số lượng bình luận theo nhóm sentiment: ")
                 fig, ax = plt.subplots(figsize=(10, 5))
                 ax = sns.countplot(x='sentiment', data=df_after_predict)
+                # add percentage in center of bar chart
+                for p in ax.patches:
+                    ax.annotate('{:.2f}%'.format(100*p.get_height()/len(df_after_predict)),
+                                (p.get_x()+0.4, p.get_height()+0.03), 
+                                color='black', ha='center')
                 st.pyplot(fig)
                 
                 # download file excel
@@ -356,6 +336,11 @@ elif choice == 'Dự đoán mới':
                 st.subheader("Biểu đồ cột thể hiện số lượng bình luận theo nhóm sentiment: ")
                 fig, ax = plt.subplots(figsize=(10, 5))
                 ax = sns.countplot(x='sentiment', data=df_after_predict)
+                # add percentage in center of bar chart
+                for p in ax.patches:
+                    ax.annotate('{:.2f}%'.format(100*p.get_height()/len(df_after_predict)),
+                                (p.get_x()+0.4, p.get_height()+0.03), 
+                                color='black', ha='center')
                 st.pyplot(fig)
                 
                 # download file csv
@@ -365,5 +350,49 @@ elif choice == 'Dự đoán mới':
                 output.seek(0)
                 st.download_button('Download', data=output, file_name='result_csv.csv', mime='text/csv')
 
-            
+    elif choice == "Tải tệp âm thanh" :
+        st.write('Click link bên dưới để ghi âm bình luận')
+        st.header("https://vocalremover.org/vi/voice-recorder")
+        # Tạo một khu vực để tải lên tệp âm thanh
+        audio_file = st.file_uploader("Tải lên tệp âm thanh", type=["wav", "mp3"])
+
+        # Tạo một nút để phát âm
+        if st.button("Phát âm file đã tải"):
+            if audio_file is not None:
+                # Đọc dữ liệu âm thanh
+                audio_bytes = audio_file.read()
+                # Phát âm thanh
+                # st.audio(audio_bytes, format='audio/ogg')
+                st.audio(audio_bytes)
+            else:
+                st.warning("Hãy tải lên một tệp âm thanh để phát âm")
+
+        # Tạo một nút để bắt đầu chuyển đổi giọng nói thành văn bản
+        if st.button("Chuyển đổi giọng nói thành bình luận và dự đoán"):
+
+            if audio_file is not None:
+                # Sử dụng thư viện SpeechRecognition để chuyển đổi tệp âm thanh thành văn bản
+                r = sr.Recognizer()
+                audio_data = sr.AudioFile(audio_file)
+                with audio_data as source:
+                    audio = r.record(source)
+                    text = r.recognize_google(audio, language="vi-VN")
+                
+                # Hiển thị văn bản được chuyển đổi
+                st.write('Câu bình luận của bạn :'+text)
+                # Dự đoán
+                text = text_transform(text)
+                text = tfidf.transform([text])
+                y_predict = model.predict(text)
+
+                if y_predict[0] == 1:
+                    sentiment = 'Tình cảm của bình luận là tích cực'
+                    st.write(sentiment)
+                else:
+                    sentiment = 'Tình cảm của bình luận là tiêu cực'
+                    st.write(sentiment)
+                    # text_to_speech(sentiment)
+
+            else:
+                st.warning("Hãy tải lên một tệp âm thanh để chuyển đổi")
 
