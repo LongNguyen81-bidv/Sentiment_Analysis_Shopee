@@ -5,7 +5,6 @@ seaborn
 streamlit
 underthesea
 wordcloud
-import_ipynb
 playsound
 gtts
 pyaudio
